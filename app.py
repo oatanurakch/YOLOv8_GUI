@@ -153,7 +153,6 @@ class mainui(Ui_MainWindow):
         # Custom bounding box
         for r in results:
             for i in range(len(r.boxes.cls)):
-                print(f'Class: {r.boxes.cls}')
                 # Classname of object
                 classnames.append(names[int(r.boxes.cls[i])])
                 # Confidence of object
