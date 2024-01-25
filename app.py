@@ -140,7 +140,8 @@ class mainui(Ui_MainWindow):
         xyxys = []
         colors_box = []
         quantity_color_of_each_object = {}
-        count_xyxys_of_each_object = []
+        list_result_name_xyxy_qty = []
+        str_result = ''
         # Predict
         results = self.model.predict(source = source_img,
                                      conf = self.conf,
@@ -167,12 +168,19 @@ class mainui(Ui_MainWindow):
                     color = colors(int(r.boxes.cls[i]), False)
                     quantity_color_of_each_object[names[int(r.boxes.cls[i])]] = {'color' : color, 'qty' : 1}
                     # Append xyxys of each object to list
-                    count_xyxys_of_each_object.append({'name' : names[int(r.boxes.cls[i])], 'xyxys' : [(r.boxes.xyxy[i]).cpu().numpy()], 'qty' : 1})
+                    list_result_name_xyxy_qty.append({'name' : names[int(r.boxes.cls[i])], 'xyxys' : [(r.boxes.xyxy[i]).cpu().numpy()], 'qty' : 1})
                 else:
                     # Append color and quantity of each object to dictionary
                     quantity_color_of_each_object[names[int(r.boxes.cls[i])]]['qty'] += 1
                     # Append xyxys of each object to list
-                    count_xyxys_of_each_object.append({'name' : names[int(r.boxes.cls[i])], 'xyxys' : [(r.boxes.xyxy[i]).cpu().numpy()], 'qty' : quantity_color_of_each_object[names[int(r.boxes.cls[i])]]['qty']})
+                    list_result_name_xyxy_qty.append({'name' : names[int(r.boxes.cls[i])], 'xyxys' : [(r.boxes.xyxy[i]).cpu().numpy()], 'qty' : quantity_color_of_each_object[names[int(r.boxes.cls[i])]]['qty']})
+        # Append string result
+        for key, value in quantity_color_of_each_object.items():
+            str_result += '{}: {}\n' .format(key, value.get('qty'))
+        # Clear result text
+        self.resulttext.clear()
+        # Show result text
+        self.resulttext.appendPlainText(str_result)
         # Annotate
         annotated_res = source_img.copy()
         # class 0 is class only
@@ -198,7 +206,7 @@ class mainui(Ui_MainWindow):
                                       classnames = classnames, 
                                       confidences = confidences,
                                       colors = colors_box,
-                                      ).drawQuantity(classnames_xyxys_count_object = count_xyxys_of_each_object)
+                                      ).drawQuantity(classnames_xyxys_count_object = list_result_name_xyxy_qty)
         
         # Return annotated result
         return annotated_res
